@@ -1,0 +1,33 @@
+{
+  "remoteconfig": {
+    "template": "remoteconfig.template.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mymoviesapp-b2701",
+          "appId": "1:208006823992:android:c43eccdfab8b6eb152a6cd",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "mymoviesapp-b2701",
+          "appId": "1:208006823992:ios:74a177598fa5fdd752a6cd",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mymoviesapp-b2701",
+          "configurations": {
+            "android": "1:208006823992:android:c43eccdfab8b6eb152a6cd",
+            "ios": "1:208006823992:ios:74a177598fa5fdd752a6cd"
+          }
+        }
+      }
+    }
+  }
+}
