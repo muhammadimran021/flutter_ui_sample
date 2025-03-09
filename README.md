@@ -15,3 +15,13 @@ A Flutter project using Firebase Remote Config, App Localizations, Shimmer for l
    cd flutter_ui_sample
    flutter pub get
    flutter run
+
+
+## Screenshots
+
+<p align="center">
+  <img src="https://github.com/muhammadimran021/flutter_ui_sample/raw/master/screenshots/shimmer_screen.png" width="30%" alt="Shimmer Screen">
+  <img src="https://github.com/muhammadimran021/flutter_ui_sample/blob/master/screenshots/english_Screen.png" width="30%" alt="English List">
+  <img src="https://github.com/muhammadimran021/flutter_ui_sample/raw/master/screenshots/arabic_screen.png" width="30%" alt="Arabic List">
+</p>
+
