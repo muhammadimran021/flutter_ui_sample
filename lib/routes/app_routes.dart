@@ -1,5 +1,6 @@
 class AppRoutes {
-  static String homepage = "/";
+  static String mainPage = "/";
+  static String homepage = "/homePage";
   static String searchPage = "/SearchPage";
   static String userAccountPage = "/UserAccountPage";
   static String userProfilePage = "/UserProfilePage";

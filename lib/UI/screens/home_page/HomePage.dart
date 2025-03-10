@@ -120,7 +120,7 @@ Widget _themesList(BuildContext context) {
           itemBuilder: (context, index) {
             return ThemeListItem(
               themeInteriorModel: provider.themesList[index],
-              onTap: () => context.go(AppRoutes.themeDetailPage),
+              onTap: () => context.push(AppRoutes.themeDetailPage),
               isDataLoaded: provider.isThemeItemsLoading,
             );
           },

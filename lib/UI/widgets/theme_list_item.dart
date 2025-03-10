@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ui_sample/constants/app_colors.dart';
 import 'package:flutter_ui_sample/constants/app_fonts.dart';
-import 'package:redacted/redacted.dart';
 
 import '../../constants/AppSpacing.dart';
 import '../../models/ThemeInteriorModel.dart';
@@ -12,12 +11,13 @@ import 'my_text.dart';
 class ThemeListItem extends StatelessWidget {
   final ThemeInteriorModel themeInteriorModel;
   final VoidCallback onTap;
-  final bool isDataLoaded ;
+  final bool isDataLoaded;
 
   const ThemeListItem({
     super.key,
     required this.themeInteriorModel,
-    required this.onTap, required this.isDataLoaded,
+    required this.onTap,
+    required this.isDataLoaded,
   });
 
   @override
@@ -58,7 +58,14 @@ class ThemeListItem extends StatelessWidget {
                   child: CachedNetworkImage(
                     fit: BoxFit.fill,
                     imageUrl: themeInteriorModel.imageUrl!,
-                    placeholder: (context, url) => CircularProgressIndicator(),
+                    placeholder:
+                        (context, url) => Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 ),
@@ -77,7 +84,7 @@ class ThemeListItem extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ),
       ),
     );

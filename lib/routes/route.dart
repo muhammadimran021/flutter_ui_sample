@@ -2,25 +2,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_ui_sample/routes/app_routes.dart';
 import 'package:go_router/go_router.dart';
 
-import '../UI/screens/home_page/HomePage.dart';
-import '../UI/screens/main_page.dart';
-import '../UI/screens/profile/user_profile_page.dart';
-import '../UI/screens/search_page/search_page.dart';
+import '../UI/screens/main_page/main_page.dart';
 import '../UI/screens/theme_detail_page/theme_detail_page.dart';
-import '../UI/screens/user_account_page/user_account_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final route = GoRouter(
+  initialLocation: AppRoutes.mainPage,
   navigatorKey: _rootNavigatorKey,
   routes: [
-    ShellRoute(
+    GoRoute(path: AppRoutes.mainPage, builder: (context, state) => MainPage()),
+    GoRoute(
+      path: AppRoutes.themeDetailPage,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => ThemeDetailPage(),
+    ),
+
+    /* ShellRoute(
       navigatorKey: GlobalKey<NavigatorState>(),
       builder: (context, state, child) {
         return MainPage(child: child);
       },
       routes: [
-        GoRoute(
+        */
+    /*GoRoute(
           path: AppRoutes.homepage,
           pageBuilder: (context, state) => NoTransitionPage(child: Homepage()),
           routes: [
@@ -45,8 +50,13 @@ final route = GoRouter(
           path: AppRoutes.userProfilePage,
           pageBuilder:
               (context, state) => NoTransitionPage(child: UserProfilePage()),
+        ),*/
+    /*
+        GoRoute(
+          path: AppRoutes.themeDetailPage,
+          builder: (context, state) => ThemeDetailPage(),
         ),
       ],
-    ),
+    ),*/
   ],
 );

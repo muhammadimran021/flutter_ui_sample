@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_ui_sample/UI/screens/main_page/MainPageProvider.dart';
 import 'package:flutter_ui_sample/constants/app_fonts.dart';
 import 'package:flutter_ui_sample/routes/route.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,7 +31,10 @@ Future<void> main() async {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => HomeProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => MainPageProvider()),
+      ],
 
       child: EasyLocalization(
         supportedLocales: [Locale('en'), Locale('ar')],
