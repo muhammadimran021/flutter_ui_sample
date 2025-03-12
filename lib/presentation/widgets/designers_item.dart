@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 
 import '../../constants/AppSpacing.dart';
 import '../../constants/app_colors.dart';
@@ -28,11 +29,9 @@ class DesignersItem extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppValues.appValue_20),
-          child: CachedNetworkImage(
+          child: CachedImage(
             fit: BoxFit.cover,
             imageUrl: designersList,
-            placeholder: (context, url) => CircularProgressIndicator(),
-            errorWidget: (context, url, error) => Icon(Icons.error),
           ),
         ),
       ),

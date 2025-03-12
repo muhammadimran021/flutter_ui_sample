@@ -2,13 +2,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_ui_sample/UI/screens/main_page/MainPageProvider.dart';
 import 'package:flutter_ui_sample/constants/app_fonts.dart';
-import 'package:flutter_ui_sample/routes/route.dart';
+import 'package:flutter_ui_sample/presentation/routes/route.dart';
+import 'package:flutter_ui_sample/presentation/screens/home_page/home_provider.dart';
+import 'package:flutter_ui_sample/presentation/screens/main_page/MainPageProvider.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/movie_provider.dart';
+import 'package:flutter_ui_sample/presentation/screens/movies_page/movies_provider.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_provider.dart';
+import 'package:flutter_ui_sample/presentation/screens/splash_page/SplashProvider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'UI/screens/home_page/home_provider.dart';
 import 'constants/app_colors.dart';
 
 Future<void> main() async {
@@ -34,6 +38,10 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => MainPageProvider()),
+        ChangeNotifierProvider(create: (_) => SplashProvider()),
+        ChangeNotifierProvider(create: (_) => MoviesProvider()),
+        ChangeNotifierProvider(create: (_) => MovieDetailPageProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
 
       child: EasyLocalization(
@@ -50,8 +58,21 @@ Future<void> _setupFirebaseConfigs() async {
   await Firebase.initializeApp();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late HomeProvider homeProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    homeProvider = Provider.of<HomeProvider>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {

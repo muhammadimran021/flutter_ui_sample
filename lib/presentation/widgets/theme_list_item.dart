@@ -1,11 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ui_sample/constants/app_colors.dart';
 import 'package:flutter_ui_sample/constants/app_fonts.dart';
+import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 
 import '../../constants/AppSpacing.dart';
-import '../../models/ThemeInteriorModel.dart';
+import '../../domain/models/ThemeInteriorModel.dart';
 import 'my_text.dart';
 
 class ThemeListItem extends StatelessWidget {
@@ -55,18 +55,12 @@ class ThemeListItem extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(AppValues.appValue_30),
                   ),
-                  child: CachedNetworkImage(
+                  child: CachedImage(
                     fit: BoxFit.fill,
                     imageUrl: themeInteriorModel.imageUrl!,
-                    placeholder:
-                        (context, url) => Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    width: AppValues.appValue_200,
+                    topLeftRadius: AppValues.appValue_30,
+                    topRightRadius: AppValues.appValue_30,
                   ),
                 ),
               ),
