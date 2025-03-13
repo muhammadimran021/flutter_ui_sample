@@ -6,8 +6,6 @@ import 'package:flutter_ui_sample/constants/app_fonts.dart';
 import 'package:flutter_ui_sample/presentation/routes/route.dart';
 import 'package:flutter_ui_sample/presentation/screens/home_page/home_provider.dart';
 import 'package:flutter_ui_sample/presentation/screens/main_page/MainPageProvider.dart';
-import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/movie_provider.dart';
-import 'package:flutter_ui_sample/presentation/screens/movies_page/movies_provider.dart';
 import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_provider.dart';
 import 'package:flutter_ui_sample/presentation/screens/splash_page/SplashProvider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,11 +35,6 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
-        ChangeNotifierProvider(create: (_) => MainPageProvider()),
-        ChangeNotifierProvider(create: (_) => SplashProvider()),
-        ChangeNotifierProvider(create: (_) => MoviesProvider()),
-        ChangeNotifierProvider(create: (_) => MovieDetailPageProvider()),
-        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
 
       child: EasyLocalization(

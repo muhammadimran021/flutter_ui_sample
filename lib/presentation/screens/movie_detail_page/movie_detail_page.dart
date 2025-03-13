@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_ui_sample/domain/models/ApiResponseRootModel.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ui_sample/domain/models/FavoriteResponseModel.dart';
 import 'package:flutter_ui_sample/domain/models/FirebaseRemoteConfigs.dart';
 import 'package:flutter_ui_sample/domain/models/TopRatedMoviesRootModel.dart';
-import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/movie_provider.dart';
+import 'package:flutter_ui_sample/domain/repository_impl/MoviesRepository_Impl.dart';
+import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/movie_detail_cubit.dart';
 import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 import 'package:flutter_ui_sample/presentation/widgets/my_text.dart';
-import 'package:provider/provider.dart';
 
 import '../../../constants/AppText.dart';
 import '../../../constants/app_colors.dart';
+import '../../blocs/api_state.dart';
+import 'movie_detail_bloc.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final int movieId;
@@ -25,56 +29,43 @@ class MovieDetailPage extends StatefulWidget {
 }
 
 class _MovieDetailPageState extends State<MovieDetailPage> {
-  late MovieDetailPageProvider movieDetailPageProvider;
+  late MovieDetailPageCubit movieDetailPageCubit;
 
   @override
   void initState() {
     super.initState();
-    movieDetailPageProvider = Provider.of<MovieDetailPageProvider>(
-      context,
-      listen: false,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMovieCover(),
-            /*MyText(
-              widget.movie.title!,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),*/
-          ],
+    movieDetailPageCubit = MovieDetailPageCubit(MoviesRepositoryImpl());
+
+    return BlocProvider<MovieDetailPageCubit>(
+      create: (context) => movieDetailPageCubit,
+      child: SafeArea(
+        child: Scaffold(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_buildMovieCover()],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFavorite() {
-    return Consumer<MovieDetailPageProvider>(
-      builder: (context, provider, child) {
-        final favoriteResponseModel = provider.favoriteResponseModel;
-        if (favoriteResponseModel.apiState == ApiState.Loading) {
+    return BlocBuilder<MovieDetailPageCubit, GenericState>(
+      builder: (BuildContext context, state) {
+        if (state is LoadingState<FavoriteResponseModel>) {
           // return CircularProgressIndicator(color: Colors.black87);
-        } else if (favoriteResponseModel.apiState == ApiState.Success) {
+        } else if (state is SuccessState<FavoriteResponseModel>) {
           return _buildFavoriteIcon(true);
-        } else if (favoriteResponseModel.apiState == ApiState.Error) {
-          return Center(child: Text(favoriteResponseModel.error.toString()));
+        } else if (state is ErrorState<FavoriteResponseModel>) {
+          return Center(child: Text(state.message));
         }
         return _buildFavoriteIcon(false);
       },
     );
-  }
-
-  @override
-  void dispose() {
-    movieDetailPageProvider.favoriteResponseModel =
-        ApiResponseRootModel.initial();
-    super.dispose();
   }
 
   Widget _buildMovieCover() {
@@ -152,13 +143,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        movieDetailPageProvider.markFavorite(
-                          FirebaseRemoteConfigs.instance.markFavorite!,
-                          data: {
-                            AppText.mediaType: "movie",
-                            AppText.mediaId: widget.movieId,
-                            AppText.favorite: true,
-                          },
+                        movieDetailPageCubit.markFavorite(
+                          FetchDataEvent<FavoriteResponseModel>(
+                            endpoint:
+                                FirebaseRemoteConfigs.instance.markFavorite!,
+                            params: {
+                              AppText.mediaType: "movie",
+                              AppText.mediaId: widget.movieId,
+                              AppText.favorite: true,
+                            },
+                          ),
                         );
                       },
                       child: _buildFavorite(),

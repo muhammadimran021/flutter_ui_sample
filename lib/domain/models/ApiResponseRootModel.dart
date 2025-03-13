@@ -1,5 +1,3 @@
-
-
 enum ApiState { Initial, Loading, Success, Error }
 
 class ApiResponseRootModel<T> {
