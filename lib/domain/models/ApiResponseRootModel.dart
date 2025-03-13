@@ -1,13 +1,12 @@
-enum ApiState { Initial, Loading, Success, Error }
+enum ApiState { Success, Error }
 
 class ApiResponseRootModel<T> {
   String? error;
   T? data;
   ApiState? apiState;
+  int? statusCode;
 
-  ApiResponseRootModel({this.apiState, this.data, this.error});
+  ApiResponseRootModel({this.apiState, this.data, this.error,this.statusCode});
 
-  factory ApiResponseRootModel.initial() {
-    return ApiResponseRootModel(apiState: ApiState.Initial);
-  }
+
 }

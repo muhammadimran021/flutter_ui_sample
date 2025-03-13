@@ -6,12 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ui_sample/constants/AppPermissions.dart';
 import 'package:flutter_ui_sample/constants/AppText.dart';
 import 'package:flutter_ui_sample/constants/app_fonts.dart';
-import 'package:flutter_ui_sample/domain/models/FileUploadResponseModel.dart';
+import 'package:flutter_ui_sample/data/repository/FileUploadRepository.dart';
 import 'package:flutter_ui_sample/domain/models/FirebaseRemoteConfigs.dart';
 import 'package:flutter_ui_sample/domain/repository_impl/FileUploadRepositoryImpl.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_state.dart';
+import 'package:flutter_ui_sample/domain/use_cases/user_file_upload_use_case.dart';
 import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_bloc.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_envents.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_states.dart';
 import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,8 +33,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late UserProfileBloc userProfileBloc;
 
   @override
+  void initState() {
+    final FileUploadRepository repository = FileUploadRepositoryImpl();
+    userProfileBloc = UserProfileBloc(UserFileUploadUseCase(repository));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    userProfileBloc = UserProfileBloc(FileUploadRepositoryImpl());
     return BlocProvider<UserProfileBloc>(
       create: (context) => userProfileBloc,
       child: Column(
@@ -117,9 +124,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Widget _buildUserProfileWidget(String? imageUrl) {
-    return BlocBuilder<UserProfileBloc, GenericState>(
+    return BlocBuilder<UserProfileBloc, UserProfile>(
       builder: (context, state) {
-        if (state is LoadingState<FileUploadResponseModel>) {
+        if (state is UserFileUploadLoadingState) {
           return SizedBox(
             width: 200,
             height: 200,
@@ -127,9 +134,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: CircularProgressIndicator(color: Colors.black87),
             ),
           );
-        } else if (state is SuccessState<FileUploadResponseModel>) {
+        } else if (state is UserFileUploadSuccessState) {
           return _profileImageView(state.data.location);
-        } else if (state is ErrorState<FileUploadResponseModel>) {
+        } else if (state is UserFileUploadErrorState) {
           return _profileImageView(null);
         }
         return _profileImageView(null);
@@ -146,9 +153,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Pick an image.
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       userProfileBloc.add(
-        FetchDataEvent<FileUploadResponseModel>(
+        UserProfileUploadEvents(
           endpoint: FirebaseRemoteConfigs.instance.uploadFilePath!,
-          params: {"file": File(image!.path)},
+          data: {"file": File(image!.path)},
         ),
       );
     } else if (statuses[Permission.photos]!.isPermanentlyDenied ||

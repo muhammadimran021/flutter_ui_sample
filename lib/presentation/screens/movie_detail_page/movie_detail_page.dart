@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_sample/domain/models/FavoriteResponseModel.dart';
+import 'package:flutter_ui_sample/data/repository/MoviesRepository.dart';
 import 'package:flutter_ui_sample/domain/models/FirebaseRemoteConfigs.dart';
 import 'package:flutter_ui_sample/domain/models/TopRatedMoviesRootModel.dart';
 import 'package:flutter_ui_sample/domain/repository_impl/MoviesRepository_Impl.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
+import 'package:flutter_ui_sample/domain/use_cases/favorite_use_case.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/favorite_events.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/favorite_states.dart';
 import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/movie_detail_cubit.dart';
 import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 import 'package:flutter_ui_sample/presentation/widgets/my_text.dart';
 
 import '../../../constants/AppText.dart';
 import '../../../constants/app_colors.dart';
-import '../../blocs/api_state.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final int movieId;
@@ -33,12 +34,14 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   @override
   void initState() {
     super.initState();
+    final MoviesRepository moviesRepository = MoviesRepositoryImpl();
+    movieDetailPageCubit = MovieDetailPageCubit(
+      FavoriteUseCase(moviesRepository),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    movieDetailPageCubit = MovieDetailPageCubit(MoviesRepositoryImpl());
-
     return BlocProvider<MovieDetailPageCubit>(
       create: (context) => movieDetailPageCubit,
       child: SafeArea(
@@ -53,13 +56,13 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   }
 
   Widget _buildFavorite() {
-    return BlocBuilder<MovieDetailPageCubit, GenericState>(
+    return BlocBuilder<MovieDetailPageCubit, FavoriteState>(
       builder: (BuildContext context, state) {
-        if (state is LoadingState<FavoriteResponseModel>) {
+        if (state is FavoriteLoadingState) {
           // return CircularProgressIndicator(color: Colors.black87);
-        } else if (state is SuccessState<FavoriteResponseModel>) {
+        } else if (state is FavoriteSuccessState) {
           return _buildFavoriteIcon(true);
-        } else if (state is ErrorState<FavoriteResponseModel>) {
+        } else if (state is FavoriteErrorState) {
           return Center(child: Text(state.message));
         }
         return _buildFavoriteIcon(false);
@@ -143,10 +146,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     GestureDetector(
                       onTap: () {
                         movieDetailPageCubit.markFavorite(
-                          FetchDataEvent<FavoriteResponseModel>(
+                          FavoriteEvent(
                             endpoint:
                                 FirebaseRemoteConfigs.instance.markFavorite!,
-                            params: {
+                            data: {
                               AppText.mediaType: "movie",
                               AppText.mediaId: widget.movieId,
                               AppText.favorite: true,

@@ -1,42 +1,37 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_sample/domain/models/GenresModel.dart';
-import 'package:flutter_ui_sample/domain/models/TopRatedMoviesRootModel.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
+import 'package:flutter_ui_sample/domain/use_cases/genres_movies_use_case.dart';
 
-import '../../../data/repository/MoviesRepository.dart';
-import '../../../domain/models/ApiResponseRootModel.dart';
-import '../../blocs/api_state.dart';
+import '../../../domain/use_cases/top_rated_movies_uses_case.dart';
+import 'moives_events.dart';
+import 'movies_states.dart';
 
-class MoviesBloc extends Bloc<GenericEvent, GenericState> {
-  final MoviesRepository moviesRepository;
+class MoviesBloc extends Bloc<MoviesEvents, MoviesState> {
+  final TopRateMoviesUseCase topRateMoviesUseCase;
+  final GenresMoviesUseCase genresMoviesUseCase;
 
-  MoviesBloc(this.moviesRepository) : super(InitialState()) {
+  MoviesBloc(this.topRateMoviesUseCase, this.genresMoviesUseCase)
+    : super(InitialState()) {
     /// get data from top rated movies api
-    on<FetchDataEvent<TopRatedMoviesRootModel>>((event, emit) async {
-      emit(LoadingState<TopRatedMoviesRootModel>());
-      final moviesResponse = await moviesRepository.getTopRatedMovies(
-        event.endpoint,
-        params: event.params,
-      );
-      if (moviesResponse.apiState == ApiState.Success) {
-        emit(SuccessState<TopRatedMoviesRootModel>(moviesResponse.data!));
-      } else {
-        emit(ErrorState<TopRatedMoviesRootModel>(moviesResponse.error!));
+    on<TopRatedMoviesEvent>((event, emit) async {
+      emit(TopRatedMoviesLoadingState());
+      try {
+        final moviesResponse = await topRateMoviesUseCase.call(event);
+        emit(TopRatedMoviesSuccess(moviesResponse));
+      } catch (e) {
+        emit(TopRatedMoviesErrorState(e.toString()));
       }
     });
 
     /// get data from movies genres api
-    on<FetchDataEvent<GenresModel>>((event, emit) async {
-      emit(LoadingState<GenresModel>());
-      final genresResponse = await moviesRepository.getMovesGenres(
-        event.endpoint,
-        params: event.params,
-      );
-      if (genresResponse.apiState == ApiState.Success) {
-        emit(SuccessState<GenresModel>(genresResponse.data!));
-      } else {
-        emit(ErrorState<GenresModel>(genresResponse.error!));
+    on<GenresMoviesEvent>((event, emit) async {
+      emit(GenresLoadingState());
+      final genresResponse = await genresMoviesUseCase.call(event);
+      try {
+        emit(GenresMoviesSuccess(genresResponse));
+      } catch (e) {
+        emit(GenresErrorState(e.toString()));
       }
     });
   }
 }
+

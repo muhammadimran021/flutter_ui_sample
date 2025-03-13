@@ -1,29 +1,19 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_sample/domain/models/ApiResponseRootModel.dart';
-import 'package:flutter_ui_sample/domain/models/FileUploadResponseModel.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_state.dart';
+import 'package:flutter_ui_sample/domain/use_cases/user_file_upload_use_case.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_envents.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_states.dart';
 
-import '../../../data/repository/FileUploadRepository.dart';
+class UserProfileBloc extends Bloc<UserProfileEvents, UserProfile> {
+  final UserFileUploadUseCase _fileUploadUseCase;
 
-class UserProfileBloc extends Bloc<GenericEvent, GenericState> {
-  final FileUploadRepository _fileUploadRepository;
-
-  UserProfileBloc(this._fileUploadRepository) : super(InitialState()) {
-    on<FetchDataEvent<FileUploadResponseModel>>((event, emit) async {
-      emit(LoadingState<FileUploadResponseModel>());
-      final file = event.params!['file'];
-      final fileUploadResponse = await _fileUploadRepository.uploadFile(
-        event.endpoint,
-        file,
-      );
-      if (fileUploadResponse.apiState == ApiState.Success) {
-        emit(SuccessState<FileUploadResponseModel>(fileUploadResponse.data!));
-      } else {
-        emit(ErrorState<FileUploadResponseModel>(fileUploadResponse.error!));
+  UserProfileBloc(this._fileUploadUseCase) : super(UserProfileInitialState()) {
+    on<UserProfileUploadEvents>((event, emit) async {
+      emit(UserFileUploadLoadingState());
+      try {
+        final data = await _fileUploadUseCase.call(event);
+        emit(UserFileUploadSuccessState(data));
+      } catch (e) {
+        emit(UserFileUploadErrorState(e.toString()));
       }
     });
   }

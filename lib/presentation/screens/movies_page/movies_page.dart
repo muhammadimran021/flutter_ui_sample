@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ui_sample/constants/AppText.dart';
-import 'package:flutter_ui_sample/domain/models/GenresModel.dart';
 import 'package:flutter_ui_sample/domain/repository_impl/MoviesRepository_Impl.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_state.dart';
+import 'package:flutter_ui_sample/domain/use_cases/genres_movies_use_case.dart';
+import 'package:flutter_ui_sample/domain/use_cases/top_rated_movies_uses_case.dart';
+import 'package:flutter_ui_sample/presentation/screens/movies_page/moives_events.dart';
 import 'package:flutter_ui_sample/presentation/screens/movies_page/movies_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../constants/app_fonts.dart';
 import '../../../domain/models/FirebaseRemoteConfigs.dart';
-import '../../../domain/models/TopRatedMoviesRootModel.dart';
-import '../../blocs/api_event.dart';
-import '../../blocs/bloc_helper.dart';
 import '../../routes/app_routes.dart';
 import '../../shimmers/DynamicShimmer.dart';
 import '../../widgets/movies_card_large.dart';
 import '../../widgets/my_text.dart';
 import '../../widgets/rounded_corner_item.dart';
+import 'movies_states.dart';
 
 class MoviesPage extends StatefulWidget {
   const MoviesPage({super.key});
@@ -31,9 +30,13 @@ class _MoviesPageState extends State<MoviesPage> {
   @override
   void initState() {
     super.initState();
-    moviesBloc = MoviesBloc(MoviesRepositoryImpl());
+    final MoviesRepositoryImpl moviesRepositoryImpl = MoviesRepositoryImpl();
+    moviesBloc = MoviesBloc(
+      TopRateMoviesUseCase(moviesRepositoryImpl),
+      GenresMoviesUseCase(moviesRepositoryImpl),
+    );
     moviesBloc.add(
-      FetchDataEvent<TopRatedMoviesRootModel>(
+      TopRatedMoviesEvent(
         endpoint: FirebaseRemoteConfigs.instance.topRatedMoviesPath!,
         params: {
           FirebaseRemoteConfigs.instance.language!: "en",
@@ -42,7 +45,7 @@ class _MoviesPageState extends State<MoviesPage> {
       ),
     );
     moviesBloc.add(
-      FetchDataEvent<GenresModel>(
+      GenresMoviesEvent(
         endpoint: FirebaseRemoteConfigs.instance.genreMovieListPath!,
         params: {FirebaseRemoteConfigs.instance.language!: "en"},
       ),
@@ -80,12 +83,14 @@ class _MoviesPageState extends State<MoviesPage> {
   }
 
   Widget _genresList() {
-    return BlocBuilder<MoviesBloc, GenericState>(
+    return BlocBuilder<MoviesBloc, MoviesState>(
       buildWhen: (previous, current) {
-        return shouldBuildWhen<GenresModel>(current);
+        return current is GenresMoviesSuccess ||
+            current is GenresLoadingState ||
+            current is GenresErrorState;
       },
       builder: (context, state) {
-        if (state is LoadingState<GenresModel>) {
+        if (state is GenresLoadingState) {
           return Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: const DynamicShimmer(
@@ -93,7 +98,7 @@ class _MoviesPageState extends State<MoviesPage> {
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
           );
-        } else if (state is SuccessState<GenresModel>) {
+        } else if (state is GenresMoviesSuccess) {
           final genresModel = state.data;
           return ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -107,7 +112,7 @@ class _MoviesPageState extends State<MoviesPage> {
             },
             itemCount: genresModel.genres!.length,
           );
-        } else if (state is ErrorState) {
+        } else if (state is GenresErrorState) {
           final errorMessage = state.message;
           print('IMRAN:: $errorMessage');
         }
@@ -117,12 +122,14 @@ class _MoviesPageState extends State<MoviesPage> {
   }
 
   Widget _moviesList() {
-    return BlocBuilder<MoviesBloc, GenericState>(
+    return BlocBuilder<MoviesBloc, MoviesState>(
       buildWhen: (previous, current) {
-        return shouldBuildWhen<TopRatedMoviesRootModel>(current);
+        return current is TopRatedMoviesLoadingState ||
+            current is TopRatedMoviesErrorState ||
+            current is TopRatedMoviesSuccess;
       },
       builder: (context, state) {
-        if (state is LoadingState<TopRatedMoviesRootModel>) {
+        if (state is TopRatedMoviesLoadingState) {
           return Padding(
             padding: const EdgeInsets.only(top: 40, left: 20.0, bottom: 30),
             child: DynamicShimmer(
@@ -132,7 +139,7 @@ class _MoviesPageState extends State<MoviesPage> {
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
           );
-        } else if (state is SuccessState<TopRatedMoviesRootModel>) {
+        } else if (state is TopRatedMoviesSuccess) {
           final data = state.data;
           return SizedBox(
             height: 500,
@@ -152,7 +159,7 @@ class _MoviesPageState extends State<MoviesPage> {
               scrollDirection: Axis.horizontal,
             ),
           );
-        } else if (state is ErrorState<TopRatedMoviesRootModel>) {
+        } else if (state is TopRatedMoviesErrorState) {
           final errorMessage = state.message;
           print('IMRAN:: $errorMessage');
         }

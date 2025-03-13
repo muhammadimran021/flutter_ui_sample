@@ -1,23 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ui_sample/data/repository/MoviesRepository.dart';
-import 'package:flutter_ui_sample/domain/models/ApiResponseRootModel.dart';
-import 'package:flutter_ui_sample/domain/models/FavoriteResponseModel.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
-import 'package:flutter_ui_sample/presentation/blocs/api_state.dart';
+import 'package:flutter_ui_sample/domain/use_cases/favorite_use_case.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/favorite_events.dart';
+import 'package:flutter_ui_sample/presentation/screens/movie_detail_page/favorite_states.dart';
 
-class MovieDetailPageCubit
-    extends Cubit<GenericState<FavoriteResponseModel>> {
-  final MoviesRepository moviesRepository;
+class MovieDetailPageCubit extends Cubit<FavoriteState> {
+  final FavoriteUseCase favoriteUseCase;
 
-  MovieDetailPageCubit(this.moviesRepository) : super(InitialState());
+  MovieDetailPageCubit(this.favoriteUseCase) : super(FavoriteInitialState());
 
-  Future<void> markFavorite(FetchDataEvent event) async {
-    emit(LoadingState<FavoriteResponseModel>());
-    final response = await moviesRepository.markFavorite(event.endpoint, data: event.params);
-    if (response.apiState == ApiState.Success) {
-      emit(SuccessState<FavoriteResponseModel>(response.data!));
-    } else {
-      emit(ErrorState<FavoriteResponseModel>(response.error!));
+  Future<void> markFavorite(FavoriteEvent event) async {
+    emit(FavoriteLoadingState());
+    final response = await favoriteUseCase.call(event);
+    try {
+      emit(FavoriteSuccessState(response));
+    } catch (e) {
+      emit(FavoriteErrorState(e.toString()));
     }
   }
 }
