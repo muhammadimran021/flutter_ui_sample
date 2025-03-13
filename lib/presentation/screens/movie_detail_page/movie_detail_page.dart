@@ -12,7 +12,6 @@ import 'package:flutter_ui_sample/presentation/widgets/my_text.dart';
 import '../../../constants/AppText.dart';
 import '../../../constants/app_colors.dart';
 import '../../blocs/api_state.dart';
-import 'movie_detail_bloc.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final int movieId;

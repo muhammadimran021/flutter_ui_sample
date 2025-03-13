@@ -7,7 +7,7 @@ import '../home_page/HomePage.dart';
 import '../movies_page/movies_page.dart';
 import '../profile/user_profile_page.dart';
 import '../user_account_page/user_account_page.dart';
-import 'MainPageProvider.dart';
+import 'MainPageCubit.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

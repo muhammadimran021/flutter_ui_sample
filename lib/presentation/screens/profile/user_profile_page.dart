@@ -11,7 +11,7 @@ import 'package:flutter_ui_sample/domain/models/FirebaseRemoteConfigs.dart';
 import 'package:flutter_ui_sample/domain/repository_impl/FileUploadRepositoryImpl.dart';
 import 'package:flutter_ui_sample/presentation/blocs/api_event.dart';
 import 'package:flutter_ui_sample/presentation/blocs/api_state.dart';
-import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_provider.dart';
+import 'package:flutter_ui_sample/presentation/screens/profile/user_profile_bloc.dart';
 import 'package:flutter_ui_sample/presentation/widgets/CachedImage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';

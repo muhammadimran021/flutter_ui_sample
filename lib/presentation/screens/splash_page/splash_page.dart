@@ -3,7 +3,7 @@ import 'package:flutter_ui_sample/domain/repository_impl/SplashRepositoryImpl.da
 import 'package:go_router/go_router.dart';
 
 import '../../routes/app_routes.dart';
-import 'SplashProvider.dart';
+import 'SplashCubit.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
